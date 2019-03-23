@@ -27,6 +27,9 @@
     <div class="card card-login mx-auto mt-5">
       <div class="card-header">Login</div>
       <div class="card-body">
+        {% if user.is_authenticated %}
+          <a href="{% url 'index' %}">GO to the index page.</a>
+        {% else %}
         <form method="post">
           {% csrf_token %}
           <fieldset class="form-group">
@@ -40,6 +43,7 @@
           <!--<a class="d-block small mt-3" href="register.html">Register an Account</a>-->
           <!--<a class="d-block small" href="forgot-password.html">Forgot Password?</a>&ndash;&gt;-->
         </div>
+        {% endif %}
       </div>
     </div>
   </div>
