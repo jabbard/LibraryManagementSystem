@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row" style="padding-top: 20px; float: right;">
+        <a href="{% url 'add_genre' %}"><button type="button" class="btn btn-outline-dark"><i class="fas fa-plus-circle"> Add New Genre</i></button></a>
+    </div>
+
+    <br/>
+    <br/>
+  <br/>
+  <br/>
+    <div class="row">
+        <table class="table" >
+            <thead>
+              <tr>
+                <th>Genre ID</th>
+                <th>Genre Name</th>
+                <th>Description</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for genre in genre_list %}
+              <tr>
+                <td>{{ genre.genre_id }}</td>
+                <td>{{ genre.genre_name }}</td>
+                <td>{{ genre.description }}</td>
+                  <td>
+                  <a href="{% url 'update_genre' genre.genre_id %}">
+                    <button type="button" class="btn btn-primary">Change</button>
+                  </a>
+
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

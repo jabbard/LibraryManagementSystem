@@ -4,29 +4,30 @@ from datetime import date
 
 # Create your models here.
 class Authors(models.Model):
-    author_id = models.AutoField(primary_key=True, max_length=10)
+    author_id = models.CharField(primary_key=True, max_length=10)
     author_name = models.CharField(max_length=100, default="")
 
     def __str__(self):
-        return str(self.author_id)
+        return self.author_name
 
 class Publishers(models.Model):
-    publish_id = models.AutoField(primary_key=True, max_length=10)
+    publish_id = models.CharField(primary_key=True, max_length=10)
     publisher_name = models.CharField(max_length=255, default="")
     city = models.CharField(max_length=255, default="")
 
     def __str__(self):
-        return str(self.publish_id)
+        return self.publisher_name
 
 class Genres(models.Model):
-    genre_id = models.AutoField(primary_key=True, max_length=10)
+    genre_id = models.CharField(primary_key=True, max_length=10)
     genre_name = models.CharField(max_length=100, default="")
+    description = models.TextField(default="")
 
     def __str__(self):
-        return str(self.genre_id)
+        return self.genre_name
 
 class Books(models.Model):
-    book_id = models.AutoField(primary_key=True, max_length=10)
+    book_id = models.CharField(primary_key=True, max_length=10)
     book_name = models.CharField(max_length=255, default="")
     isbn_regex = RegexValidator(regex='^[0-9]{10}|[0-9]{13}$', message="The ISBN number should be 10 or 13 digit in length.")
     ISBN = models.CharField(validators=[isbn_regex],max_length=100, default="")
@@ -39,7 +40,7 @@ class Books(models.Model):
     genre = models.ForeignKey(Genres, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return str(self.book_id)
+        return self.book_name
 
 
 class Books_Authors(models.Model):
@@ -58,11 +59,11 @@ class Book_Number(models.Model):
         return self.b_id
 
 class Faculty(models.Model):
-    f_id = models.AutoField(primary_key=True, max_length=10)
+    f_id = models.CharField(primary_key=True, max_length=10)
     f_name = models.CharField(max_length=100, default="")
 
     def __str__(self):
-        return str(self.f_id)
+        return self.f_name
 
 class Students(models.Model):
     s_id = models.CharField(primary_key=True, max_length=10)
@@ -74,7 +75,7 @@ class Students(models.Model):
     faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return self.s_id
+        return self.st_name
 
 class Transactions(models.Model):
     sn = models.AutoField(primary_key=True)
