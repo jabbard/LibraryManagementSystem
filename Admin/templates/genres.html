@@ -11,7 +11,44 @@
     <br/>
   <br/>
   <br/>
-    <div class="row">
+  <div class="card mb-3">
+      <div class="card-header">
+        <i class="fas fa-table"></i>
+        Genres Table</div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+              <tr>
+                <th>Genre ID</th>
+                <th>Genre Name</th>
+                <th>Description</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for genre in genre_list %}
+              <tr>
+                <td>{{ genre.genre_id }}</td>
+                <td>{{ genre.genre_name }}</td>
+                <td>{{ genre.description }}</td>
+                  <td>
+                  <a href="{% url 'update_genre' genre.genre_id %}">
+                    <button type="button" class="btn btn-primary">Change</button>
+                  </a>
+
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!--<div class="row">
         <table class="table" >
             <thead>
               <tr>
@@ -37,6 +74,6 @@
               {% endfor %}
             </tbody>
         </table>
-    </div>
+    </div>-->
 </div>
 {% endblock %}

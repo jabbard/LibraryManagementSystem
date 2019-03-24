@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from .models import *
-from .forms import BookForm, GenreForm, AuthorForm, PublisherForm
+from .forms import BookForm, GenreForm, AuthorForm, PublisherForm, FacultyForm, StudentForm
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import views
-
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
 
 @login_required
 def index(request):
@@ -127,6 +128,7 @@ def publisher(request):
 def add_publisher(request):
     form = PublisherForm(request.POST or None)
     if form.is_valid():
+
         form.save()
         return redirect('publisher')
 
@@ -151,3 +153,94 @@ def delete_publisher(request, id):
         return redirect('publisher')
 
     return render(request, "confirmation.html", {'publisher':publisher})
+
+@login_required
+def faculty(request):
+    faculties = Faculty.objects.all()
+
+    return render(request, "faculties.html", {'faculty':faculties})
+
+@login_required
+def add_faculty(request):
+    form = FacultyForm(request.POST or None)
+
+    if form.is_valid():
+        form.save()
+        return redirect('faculty')
+
+    return render(request, "new_faculty.html", {'form': form})
+
+@login_required
+def update_faculty(request, id):
+    faculty = Faculty.objects.get(f_id=id)
+
+    form = FacultyForm(request.POST or None, instance=faculty)
+
+    if form.is_valid():
+        form.save()
+        return redirect('faculty')
+
+    return render(request, "new_faculty.html", {'form': form, 'faculties': faculty})
+
+@login_required
+def delete_faculty(request,id):
+    faculty = Faculty.objects.get(f_id=id)
+
+    if request.method == "POST":
+        faculty.delete()
+        return redirect('faculty')
+
+    return render(request, "confirmation.html", {'faculties': faculty})
+
+@login_required
+def student(request):
+    student = Students.objects.all()
+
+    return render(request,"students.html", {'students':student})
+
+@login_required
+def add_student(request):
+    form = StudentForm(request.POST or None)
+
+    if form.is_valid():
+        form.save()
+        return redirect('student')
+
+    return render(request, "new_student.html", {'form': form})
+
+@login_required
+def update_student(request, id):
+    student = Students.objects.get(s_id=id)
+    form = StudentForm(request.POST or None, instance=student)
+
+    if form.is_valid():
+        form.save()
+        return redirect('student')
+
+    return render(request, "new_student.html", {'form':form,'students': student})
+
+@login_required()
+def delete_student(request, id):
+    student = Students.objects.get(s_id=id)
+
+    if request.method == 'POST':
+        student.delete()
+        return redirect('student')
+
+    return render(request, "confirmation.html", {'student':student})
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(data=request.POST, user=request.user)
+        if form.is_valid():
+            messages.success(request, "Password Changed Successfully!")
+            form.save()
+            update_session_auth_hash(request, form.user)
+            return redirect('index')
+        else:
+            messages.error(request, "Failure")
+            return redirect('change_password')
+    else:
+        form = PasswordChangeForm(user=request.user)
+        return render(request, "change_password.html", {'form':form})

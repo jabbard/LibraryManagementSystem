@@ -22,4 +22,16 @@ urlpatterns = [
     path('add_publisher/', user_views.add_publisher, name="add_publisher"),
     path('update_publisher/<slug:id>', user_views.update_publisher, name="update_publisher"),
     path('delete_publisher/<slug:id>', user_views.delete_publisher, name="delete_publisher"),
+    path('faculty/', user_views.faculty, name="faculty"),
+    path('add_faculty/', user_views.add_faculty, name="add_faculty"),
+    path('update_faculty/<slug:id>', user_views.update_faculty, name="update_faculty"),
+    path('delete_faculty/<slug:id>', user_views.delete_faculty, name="delete_faculty"),
+    path('student/', user_views.student, name="student"),
+    path('add_student/', user_views.add_student, name="add_student"),
+    path('update_student/<slug:id>', user_views.update_student, name="update_student"),
+    path('delete_student/<slug:id>', user_views.delete_student, name="delete_student"),
+    path('delete_student/<slug:id>', user_views.delete_student, name="delete_student"),
+    path('change_password/', user_views.change_password, name="change_password"),
+
+
 ]

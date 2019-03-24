@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row" style="padding-top: 20px; float: right; margin-right: 1px;">
+        <a href="{% url 'add_student' %}"><button type="button" class="btn btn-outline-dark"><i class="fas fa-plus-circle"> Add New Student</i></button></a>
+    </div>
+
+    <br/>
+    <br/>
+  <br/>
+  <br/>
+    <div class="card mb-3">
+          <div class="card-header">
+            <i class="fas fa-table"></i>
+            Student Table</div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                  <tr>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Contact No.</th>
+                    <th>Email</th>
+                    <th>Faculty</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {% for student in students %}
+                    <tr>
+                       <td>{{ student.s_id }}</td>
+                       <td>{{ student.st_name }}</td>
+                       <td>{{ student.ph_num }}</td>
+                       <td>{{ student.email }}</td>
+                       <td>{{ student.faculty }}</td>
+                       <td>
+                         <a href="{% url 'update_student' student.s_id %}">
+                            <button type="button" class="btn btn-outline-primary">Change</button>
+                         </a>
+                       </td>
+                    </tr>
+                  {% endfor %}
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+
+    <!--<div class="row">
+        <table class="table">
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Contact No.</th>
+                    <th>Email</th>
+                    <th>Faculty</th>
+                    <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for student in students %}
+              <tr>
+                <td>{{ student.s_id }}</td>
+                <td>{{ student.st_name }}</td>
+                <td>{{ student.ph_num }}</td>
+                <td>{{ student.email }}</td>
+                <td>{{ student.faculty }}</td>
+                  <td>
+                  <a href="{% url 'update_student' student.s_id %}">
+                    <button type="button" class="btn btn-outline-primary">Change</button>
+                  </a>
+
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+    </div>-->
+</div>
+{% endblock %}

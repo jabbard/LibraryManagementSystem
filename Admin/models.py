@@ -54,6 +54,7 @@ class Books_Authors(models.Model):
 class Book_Number(models.Model):
     b_id = models.CharField(primary_key=True, max_length=10)
     book_id = models.ForeignKey(Books, on_delete=models.CASCADE)
+    status = models.BinaryField(default=0)
 
     def __str__(self):
         return self.b_id
