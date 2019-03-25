@@ -32,7 +32,7 @@ class Books(models.Model):
     isbn_regex = RegexValidator(regex='^[0-9]{10}|[0-9]{13}$', message="The ISBN number should be 10 or 13 digit in length.")
     ISBN = models.CharField(validators=[isbn_regex],max_length=100, default="")
     description = models.TextField(default="")
-    #author = models.CharField(max_length=100, default="")
+    author = models.ManyToManyField(Authors)
     publisher = models.ForeignKey(Publishers, on_delete=models.SET_NULL, null=True)
     edition = models.CharField(max_length=255, default="")
     type_choices = (('Reference', 'Reference'),('Borrowable', 'Borrowable'))
@@ -43,18 +43,18 @@ class Books(models.Model):
         return self.book_name
 
 
-class Books_Authors(models.Model):
+"""class Books_Authors(models.Model):
     id = models.AutoField(primary_key=True)
     book_id = models.ForeignKey(Books, on_delete=models.CASCADE, default="")
     author_id = models.ForeignKey(Authors, on_delete=models.CASCADE, default="")
 
     def __str__(self):
-        return str(id)
+        return str(id)"""
 
 class Book_Number(models.Model):
     b_id = models.CharField(primary_key=True, max_length=10)
     book_id = models.ForeignKey(Books, on_delete=models.CASCADE)
-    status = models.BinaryField(default=0)
+    status = models.IntegerField(default=0)
 
     def __str__(self):
         return self.b_id
@@ -79,7 +79,7 @@ class Students(models.Model):
         return self.st_name
 
 class Transactions(models.Model):
-    sn = models.AutoField(primary_key=True)
+    sn = models.BigAutoField(primary_key=True)
     student_id = models.ForeignKey(Students, on_delete=models.SET_NULL, null=True)
     b_id = models.ForeignKey(Book_Number, on_delete=models.SET_NULL, null=True)
     issued_date = models.DateField(default=date.today)

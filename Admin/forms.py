@@ -36,6 +36,7 @@ class StudentForm(forms.ModelForm):
     ph_num = forms.CharField(label='Phone Number')
     email = forms.EmailField(label='Email')
 
+
     class Meta:
         model = Students
         fields = ['s_id', 'st_name', 'ph_num', 'email', 'faculty']
