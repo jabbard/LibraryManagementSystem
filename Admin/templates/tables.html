@@ -4,43 +4,59 @@
 
 {% block body %}
 <div class="container">
-<div class="row">
-  <div class="col-md-10 offset-md-10" style="padding-top: 20px;">
-    <a href="{% url 'add_books' %}"><button type="button" class="btn btn-success"><i class="fas fa-plus-circle">Add New Book</i></button></a>
-</div>
-</div>
-  <br/>
-  <br/>
-<div class="row">
-<table class="table" >
-    <thead>
-      <tr>
-        <th>Book ID</th>
-        <th>Book Name</th>
-        <th>Description</th>
-        <th>Type</th>
-        <th>Genre</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for book in book_list %}
-      <tr>
-        <td>{{ book.book_id }}</td>
-        <td>{{ book.book_name }}</td>
-        <td>{{ book.description }}</td>
-        <td>{{ book.type }}</td>
-        <td>{{ book.genre }}</td>
-        <td>
-          <a href="{% url 'update_book' book.book_id %}">
-            <button type="button" class="btn btn-primary">Change</button>
-          </a>
 
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+  <div class="row" style="padding-top: 20px; float: right; margin-right: 0px;">
+        <a href="{% url 'add_books' %}"><button type="button" style="font-family: 'Century Gothic'" class="btn btn-outline-dark"><i class="fas fa-plus-circle"> Add New Book</i></button></a>
+    </div>
+
+  <br/>
+  <br/>
+  <br/>
+  <br/>
+
+  <div class="card mb-3">
+      <div class="card-header">
+        <i class="fas fa-table"></i>
+        Author Table</div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+              <tr>
+                <th>Book ID</th>
+                <th>Book Name</th>
+                <th>Authors</th>
+                <th>Publishers</th>
+                <th>Type</th>
+                <th>Genre</th>
+                <th>Description</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for book in book_list %}
+              <tr>
+                <td>{{ book.book_id }}</td>
+                <td>{{ book.book_name }}</td>
+                <td>{{ book.description }}</td>
+                <td>{% for i in book.author.all %}{{ i.author_name }} <br/> {% endfor %}</td>
+                <td>{{ book.publisher }}</td>
+                <td>{{ book.type }}</td>
+                <td>{{ book.genre }}</td>
+                <td>
+                  <a href="{% url 'update_book' book.book_id %}">
+                    <button type="button" class="btn btn-primary">Change</button>
+                  </a>
+
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
 </div>
 {% endblock %}

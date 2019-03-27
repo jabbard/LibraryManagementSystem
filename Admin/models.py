@@ -32,7 +32,7 @@ class Books(models.Model):
     isbn_regex = RegexValidator(regex='^[0-9]{10}|[0-9]{13}$', message="The ISBN number should be 10 or 13 digit in length.")
     ISBN = models.CharField(validators=[isbn_regex],max_length=100, default="")
     description = models.TextField(default="")
-    author = models.ManyToManyField(Authors)
+    author = models.ManyToManyField(Authors, related_name='author')
     publisher = models.ForeignKey(Publishers, on_delete=models.SET_NULL, null=True)
     edition = models.CharField(max_length=255, default="")
     type_choices = (('Reference', 'Reference'),('Borrowable', 'Borrowable'))
