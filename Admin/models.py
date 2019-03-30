@@ -1,8 +1,10 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from datetime import date
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 # Create your models here.
+
 class Authors(models.Model):
     author_id = models.CharField(primary_key=True, max_length=10)
     author_name = models.CharField(max_length=100, default="")
@@ -54,7 +56,7 @@ class Books(models.Model):
 class Book_Number(models.Model):
     b_id = models.CharField(primary_key=True, max_length=10)
     book_id = models.ForeignKey(Books, on_delete=models.CASCADE)
-    status = models.IntegerField(default=0)
+    status = models.BooleanField(default=False)
 
     def __str__(self):
         return self.b_id
@@ -82,7 +84,8 @@ class Transactions(models.Model):
     sn = models.BigAutoField(primary_key=True)
     student_id = models.ForeignKey(Students, on_delete=models.SET_NULL, null=True)
     b_id = models.ForeignKey(Book_Number, on_delete=models.SET_NULL, null=True)
-    issued_date = models.DateField(default=date.today)
+    issued_date = models.DateField(auto_now=True, editable=False)
+    return_date = models.DateField(auto_now=True)
 
     def __str__(self):
         return str(self.sn)

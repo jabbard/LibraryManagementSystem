@@ -5,9 +5,14 @@ class BookForm(forms.ModelForm):
     book_id = forms.CharField(label='Book ID')
     book_name = forms.CharField(label='Book Name')
     ISBN = forms.CharField(label='ISBN')
+    author = forms.ModelMultipleChoiceField(queryset=Authors.objects.all())
+
     class Meta:
         model = Books
         fields = ['book_id', 'book_name', 'ISBN', 'description', 'author', 'publisher', 'edition', 'type', 'genre']
+
+
+
 
 class GenreForm(forms.ModelForm):
     genre_id = forms.CharField(label='Genre ID')
@@ -49,3 +54,4 @@ class StudentForm(forms.ModelForm):
     class Meta:
         model = Students
         fields = ['s_id', 'st_name', 'ph_num', 'email', 'faculty']
+

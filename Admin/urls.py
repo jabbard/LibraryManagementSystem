@@ -8,8 +8,8 @@ urlpatterns = [
     path('books/new_book/', user_views.add_books, name="add_books"),
     path('books/update_book/<slug:id>', user_views.update_book, name="update_book"),
     path('books/delete_book/<slug:id>', user_views.delete_book, name="delete_book"),
-    path('admin_login/', auth_views.LoginView.as_view(template_name='login.html'), name="login"),
-    path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name="logout"),
+    path('login/', user_views.login_view, name="login"),
+    path('logout/', user_views.logout_view, name="logout"),
     path('genres/', user_views.genres, name="genre"),
     path('genres/add_genre/', user_views.add_genre, name="add_genre"),
     path('gemres/update_genre/<slug:id>', user_views.update_genre, name="update_genre"),
@@ -31,6 +31,5 @@ urlpatterns = [
     path('students/update_student/<slug:id>', user_views.update_student, name="update_student"),
     path('students/delete_student/<slug:id>', user_views.delete_student, name="delete_student"),
     path('change_password/', user_views.change_password, name="change_password"),
-
-
+    path('home/', user_views.library_home, name="library"),
 ]
