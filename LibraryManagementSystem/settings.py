@@ -43,7 +43,12 @@ INSTALLED_APPS = [
 
 ]
 
-AUTH_USER_MODELS = 'Admin.User'
+EMAIL_USE_SSL = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'pradhumnadhungana@gmail.com'
+EMAIL_HOST_PASSWORD = 'potrait123'
+EMAIL_PORT = 465
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

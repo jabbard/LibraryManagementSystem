@@ -1,7 +1,10 @@
 from django.db import models
 from django.core.validators import RegexValidator
-from datetime import date
+from datetime import datetime
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import User
+
+
 
 # Create your models here.
 
@@ -56,7 +59,8 @@ class Books(models.Model):
 class Book_Number(models.Model):
     b_id = models.CharField(primary_key=True, max_length=10)
     book_id = models.ForeignKey(Books, on_delete=models.CASCADE)
-    status = models.BooleanField(default=False)
+    status_choices = (('Available','Available'),('Taken','Taken'))
+    status = models.CharField(choices=status_choices, default="", max_length=20)
 
     def __str__(self):
         return self.b_id
@@ -75,17 +79,18 @@ class Students(models.Model):
     ph_num = models.CharField(validators=[ph_validator],max_length=15, default="")
     email_validator = RegexValidator(regex='^([\w]*[\w\.]*(?!\.)@islingtoncollege.edu.np)', message="Invalid email address!")
     email = models.EmailField(validators=[email_validator],default="")
-    faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True)
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.st_name
 
 class Transactions(models.Model):
     sn = models.BigAutoField(primary_key=True)
-    student_id = models.ForeignKey(Students, on_delete=models.SET_NULL, null=True)
-    b_id = models.ForeignKey(Book_Number, on_delete=models.SET_NULL, null=True)
-    issued_date = models.DateField(auto_now=True, editable=False)
-    return_date = models.DateField(auto_now=True)
+    student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
+    b_id = models.ForeignKey(Book_Number, on_delete=models.CASCADE)
+    issued_date = models.DateTimeField(default=datetime.now)
+    return_date = models.DateTimeField(default=datetime.now())
+    return_status = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.sn)

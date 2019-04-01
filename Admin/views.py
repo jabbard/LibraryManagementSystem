@@ -1,11 +1,19 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
-from .forms import BookForm, GenreForm, AuthorForm, PublisherForm, FacultyForm, StudentForm
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib import messages
+from .forms import BookForm, GenreForm, AuthorForm, PublisherForm, FacultyForm, StudentForm, SignupForm, IssueForm, ReturnForm
 from django.contrib.auth import logout, login, authenticate
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from .tokens import account_activation_token
+from django.contrib.auth.models import User
+from django.core.mail import EmailMessage
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
 
 
 @login_required
@@ -278,4 +286,101 @@ def login_view(request):
 
 
 def library_home(request):
-    return render(request, 'librarian/homepage.html')
+    if request.method == 'POST':
+        form = IssueForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('library')
+        else:
+            return redirect('librarian/404.html')
+    else:
+        form = IssueForm()
+    return render(request, 'librarian/homepage.html', {'form':form})
+
+def register_view(request):
+    if request.method == 'POST':
+        form = SignupForm(request.POST)
+        user = request.POST.get('username')
+        userr = Students.objects.filter(s_id=user).count()
+        if form.is_valid() and userr > 0:
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+            current_site = get_current_site(request)
+            mail_subject = 'Activate your library account'
+            message = render_to_string('activation.html', {
+                'user':user,
+                'domain': current_site.domain,
+                'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                'token':account_activation_token.make_token(user),
+            })
+            to_email = form.cleaned_data.get('email')
+            email = EmailMessage(
+                mail_subject, message, to=[to_email]
+            )
+            email.send()
+            return HttpResponse('Please confirm your email address to complete the registration')
+        else:
+            return redirect('register')
+
+    else:
+        form = SignupForm()
+    return render(request, 'adminstrator/register.html', {'form':form})
+
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        return redirect('library')
+    else:
+        return HttpResponse('Activation link is invalid!')
+
+
+def issue_book(request):
+    if request.method == 'POST':
+        st = request.POST.get('student_id')
+        trans = Transactions.objects.filter(student_id=st)
+        a=0
+        for val in trans:
+            if val.return_status==0:
+                a=a+1
+        book_id = request.POST.get('b_id')
+        book1 = Book_Number.objects.get(b_id=book_id)
+        book_num = book1.book_id
+        book = Books.objects.get(book_id=book_num.book_id)
+
+
+        form = IssueForm(request.POST)
+        if form.is_valid() and a<2 and book.type=='Borrowable' and book1.status=='Available':
+            form.save()
+            book1.status='Taken'
+            book1.save()
+            return redirect('library')
+        else:
+            return redirect('issue')
+    else:
+        form = IssueForm()
+    return render(request, 'librarian/issue_book.html', {'form':form})
+
+def return_book(request):
+    if request.method=='POST':
+        form = ReturnForm(request.POST)
+        obj = Transactions.objects.filter(b_id=request.POST.get('book_id')).filter(return_status=0)
+        if form.is_valid() and obj.count()==1:
+            objs = obj[0]
+            objs.return_date = datetime.now()
+            objs.return_status = 1
+            objs.save()
+            return redirect('library')
+        else:
+            raise ValueError('Book has been already returned!')
+    else:
+        form = ReturnForm()
+    return render(request, 'librarian/return_book.html', {'form': form})

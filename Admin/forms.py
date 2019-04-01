@@ -1,5 +1,6 @@
 from django import forms
 from .models import *
+from django.contrib.auth.forms import UserCreationForm
 
 class BookForm(forms.ModelForm):
     book_id = forms.CharField(label='Book ID')
@@ -55,3 +56,21 @@ class StudentForm(forms.ModelForm):
         model = Students
         fields = ['s_id', 'st_name', 'ph_num', 'email', 'faculty']
 
+class SignupForm(UserCreationForm):
+    email = forms.EmailField(max_length=200, help_text='Required')
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
+
+
+class IssueForm(forms.ModelForm):
+    b_id = forms.ModelChoiceField(label="Barcode", queryset=Book_Number.objects.all())
+    student_id = forms.ModelChoiceField(label="Student ID", queryset=Students.objects.all())
+    class Meta:
+        model=Transactions
+        fields= ['b_id','student_id']
+
+
+class ReturnForm(forms.Form):
+    book_id = forms.CharField(label="Book ID")

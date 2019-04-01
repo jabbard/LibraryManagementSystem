@@ -1,0 +1,23 @@
+{% extends 'librarian/homepage.html' %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <form method="post" class="col-md-6">
+            {% csrf_token %}
+            <fieldset class="form-group">
+            <legend class="border-bottom mb-4" style="text-align: center">Return Book:</legend>
+            {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button type="submit" class="btn btn-outline-secondary" style="margin-left: 230px; width: 120px;">
+                    <i class="fas fa-save"> Save</i>
+                </button>
+            </div>
+        </form>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+{% endblock %}

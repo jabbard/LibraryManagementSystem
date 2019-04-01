@@ -10,5 +10,7 @@ admin.site.register(Students)
 admin.site.register(Authors)
 admin.site.register(Genres)
 admin.site.register(Publishers)
+admin.site.register(Faculty)
+admin.site.register(Transactions)
 #admin.site.register(Books_Authors)
 
