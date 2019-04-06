@@ -13,19 +13,22 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
+from .decorators import admin_only, staff_only
 
 
 @login_required
+@admin_only
 def index(request):
     return render(request, "adminstrator/index.html")
 
 @login_required
+@admin_only
 def books(request):
     book_list = Books.objects.all()
     return render(request, "adminstrator/tables.html", {'book_list': book_list})
 
 @login_required
+@admin_only
 def add_books(request):
     form = BookForm(request.POST or None)
 
@@ -37,6 +40,7 @@ def add_books(request):
     return render(request, "adminstrator/new_book.html", {'form':form})
 
 @login_required
+@admin_only
 def update_book(request, id):
     book = Books.objects.get(book_id=id)
     form = BookForm(request.POST or None, instance=book)
@@ -47,6 +51,7 @@ def update_book(request, id):
     return render(request, "adminstrator/new_book.html", {'form':form, 'book':book})
 
 @login_required
+@admin_only
 def delete_book(request, id):
     book = Books.objects.get(book_id=id)
 
@@ -57,11 +62,13 @@ def delete_book(request, id):
     return render(request, "adminstrator/confirmation.html", {'book': book})
 
 @login_required
+@admin_only
 def genres(request):
     genre_list = Genres.objects.all()
     return render(request, "adminstrator/genres.html", {'genre_list': genre_list})
 
 @login_required
+@admin_only
 def add_genre(request):
     form = GenreForm(request.POST or None)
 
@@ -72,6 +79,7 @@ def add_genre(request):
     return render(request, "adminstrator/new_genre.html", {'form': form})
 
 @login_required
+@admin_only
 def update_genre(request, id):
     genre = Genres.objects.get(genre_id=id)
     form = GenreForm(request.POST or None, instance=genre)
@@ -83,6 +91,7 @@ def update_genre(request, id):
     return render(request, "adminstrator/new_genre.html", {'form': form, 'genre': genre})
 
 @login_required
+@admin_only
 def delete_genre(request, id):
     genre = Genres.objects.get(genre_id=id)
 
@@ -93,12 +102,14 @@ def delete_genre(request, id):
     return render(request, "adminstrator/confirmation.html", {'genre': genre})
 
 @login_required
+@admin_only
 def authors(request):
     author = Authors.objects.all()
 
     return render(request,"adminstrator/authors.html", {'author':author})
 
 @login_required
+@admin_only
 def add_author(request):
     form = AuthorForm(request.POST or None)
     authors = Authors.objects.filter(author_name=request.POST.get('author_name')).count()
@@ -113,6 +124,7 @@ def add_author(request):
     return render(request, "adminstrator/new_author.html", {'form':form})
 
 @login_required
+@admin_only
 def update_author(request, id):
     author = Authors.objects.get(author_id=id)
     form = AuthorForm(request.POST or None, instance=author)
@@ -124,6 +136,7 @@ def update_author(request, id):
     return render(request,"adminstrator/new_author.html", {'form':form, 'author':author})
 
 @login_required
+@admin_only
 def delete_author(request, id):
     authors = Authors.objects.get(author_id=id)
 
@@ -134,12 +147,14 @@ def delete_author(request, id):
     return render(request, "adminstrator/confirmation.html", {'author': authors})
 
 @login_required
+@admin_only
 def publisher(request):
     publishers = Publishers.objects.all()
 
     return render(request, "adminstrator/publishers.html", {'publishers':publishers})
 
 @login_required
+@admin_only
 def add_publisher(request):
     form = PublisherForm(request.POST or None)
     if form.is_valid():
@@ -150,6 +165,7 @@ def add_publisher(request):
     return render(request, "adminstrator/new_publisher.html", {'form':form})
 
 @login_required
+@admin_only
 def update_publisher(request, id):
     publisher = Publishers.objects.get(publish_id=id)
     form = PublisherForm(request.POST or None, instance=publisher)
@@ -161,6 +177,7 @@ def update_publisher(request, id):
     return render(request, "adminstrator/new_publisher.html", {'form':form, 'publishers':publisher})
 
 @login_required
+@admin_only
 def delete_publisher(request, id):
     publisher = Publishers.objects.get(publish_id = id)
     if request.method == "POST":
@@ -170,12 +187,14 @@ def delete_publisher(request, id):
     return render(request, "adminstrator/confirmation.html", {'publisher':publisher})
 
 @login_required
+@admin_only
 def faculty(request):
     faculties = Faculty.objects.all()
 
     return render(request, "adminstrator/faculties.html", {'faculty':faculties})
 
 @login_required
+@admin_only
 def add_faculty(request):
     form = FacultyForm(request.POST or None)
 
@@ -186,6 +205,7 @@ def add_faculty(request):
     return render(request, "adminstrator/new_faculty.html", {'form': form})
 
 @login_required
+@admin_only
 def update_faculty(request, id):
     faculty = Faculty.objects.get(f_id=id)
 
@@ -198,6 +218,7 @@ def update_faculty(request, id):
     return render(request, "adminstrator/new_faculty.html", {'form': form, 'faculties': faculty})
 
 @login_required
+@admin_only
 def delete_faculty(request,id):
     faculty = Faculty.objects.get(f_id=id)
 
@@ -208,12 +229,14 @@ def delete_faculty(request,id):
     return render(request, "adminstrator/confirmation.html", {'faculties': faculty})
 
 @login_required
+@admin_only
 def student(request):
     student = Students.objects.all()
 
     return render(request,"adminstrator/students.html", {'students':student})
 
 @login_required
+@admin_only
 def add_student(request):
     form = StudentForm(request.POST or None)
 
@@ -224,6 +247,7 @@ def add_student(request):
     return render(request, "adminstrator/new_student.html", {'form': form})
 
 @login_required
+@admin_only
 def update_student(request, id):
     student = Students.objects.get(s_id=id)
     form = StudentForm(request.POST or None, instance=student)
@@ -234,7 +258,8 @@ def update_student(request, id):
 
     return render(request, "adminstrator/new_student.html", {'form':form,'students': student})
 
-@login_required()
+@login_required
+@admin_only
 def delete_student(request, id):
     student = Students.objects.get(s_id=id)
 
@@ -245,6 +270,7 @@ def delete_student(request, id):
     return render(request, "adminstrator/confirmation.html", {'student':student})
 
 @login_required
+@admin_only
 def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(data=request.POST, user=request.user)
@@ -384,3 +410,8 @@ def return_book(request):
     else:
         form = ReturnForm()
     return render(request, 'librarian/return_book.html', {'form': form})
+
+@login_required
+def barcodes(request):
+    num = Book_Number.objects.all().prefetch_related('book_id')
+    return render(request, "adminstrator/barcode_book.html", {'num':num})

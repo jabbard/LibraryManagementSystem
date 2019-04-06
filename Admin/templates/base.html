@@ -38,12 +38,7 @@
     <!-- Navbar Search -->
     <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
       <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-        <div class="input-group-append">
-          <button class="btn btn-primary" type="button">
-            <i class="fas fa-search"></i>
-          </button>
-        </div>
+
       </div>
     </form>
 
@@ -52,7 +47,7 @@
       <li class="nav-item dropdown no-arrow mx-1">
         <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fas fa-bell fa-fw"></i>
-          <span class="badge badge-danger">9+</span>
+          <span class="badge badge-danger">8</span>
         </a>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="alertsDropdown">
           <a class="dropdown-item" href="#">Action</a>
@@ -78,6 +73,8 @@
           <i class="fas fa-user-circle fa-fw"></i>
         </a>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+          <a class="dropdown-item" href="#"><i class="fas fa-user-circle fa-fw"><p> {{ user.username }}</i></a>
+          <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="#">Settings</a>
           <a class="dropdown-item" href="{% url 'change_password' %}">Change Password</a>
           <div class="dropdown-divider"></div>
@@ -106,6 +103,7 @@
         <div class="dropdown-menu" aria-labelledby="pagesDropdown">
 
           <a class="dropdown-item" href="{% url 'book' %}">Books</a>
+          <a class="dropdown-item" href="{% url 'barcode' %}">Barcodes</a>
           <a class="dropdown-item" href="{% url 'genre'%}">Genres</a>
           <a class="dropdown-item" href="{% url 'author' %}">Authors</a>
           <a class="dropdown-item" href="{% url 'publisher' %}">Publishers</a>

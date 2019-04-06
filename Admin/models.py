@@ -59,11 +59,14 @@ class Books(models.Model):
 class Book_Number(models.Model):
     b_id = models.CharField(primary_key=True, max_length=10)
     book_id = models.ForeignKey(Books, on_delete=models.CASCADE)
-    status_choices = (('Available','Available'),('Taken','Taken'))
+    status_choices = (('Available','Available'),('Taken','Taken'),('Borrowed','Borrowed'))
     status = models.CharField(choices=status_choices, default="", max_length=20)
 
     def __str__(self):
-        return self.b_id
+        return "%s (%s)" % (
+            self.b_id,
+            ", ".join(Books.book_name for book_id in Book_Number.objects.all())
+        )
 
 class Faculty(models.Model):
     f_id = models.CharField(primary_key=True, max_length=10)
@@ -94,4 +97,11 @@ class Transactions(models.Model):
 
     def __str__(self):
         return str(self.sn)
+
+class Structures(models.Model):
+    days = models.IntegerField(default=10, max_length=2)
+    fine = models.IntegerField(default=5, max_length=2)
+
+    def __str__(self):
+        return str(self.days)+" "+str(self.fine)
 
