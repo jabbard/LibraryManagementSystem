@@ -25,7 +25,8 @@ def index(request):
 @admin_only
 def books(request):
     book_list = Books.objects.all()
-    return render(request, "adminstrator/tables.html", {'book_list': book_list})
+    storage = messages.get_messages(request)
+    return render(request, "adminstrator/tables.html", {'book_list': book_list, 'message' : storage})
 
 @login_required
 @admin_only
@@ -34,32 +35,38 @@ def add_books(request):
 
     if form.is_valid():
         form.save()
-
+        messages.success(request, "The book has been added succesfully.", extra_tags='alert')
         return redirect('book')
 
     return render(request, "adminstrator/new_book.html", {'form':form})
 
 @login_required
-@admin_only
 def update_book(request, id):
-    book = Books.objects.get(book_id=id)
-    form = BookForm(request.POST or None, instance=book)
+    if User.is_superuser:
+        book = Books.objects.get(book_id=id)
+        form = BookForm(data=request.POST or None, instance=book)
 
-    if form.is_valid():
-        form.save()
-        return redirect('book')
-    return render(request, "adminstrator/new_book.html", {'form':form, 'book':book})
+        if form.is_valid():
+            form.save()
+            messages.info(request, "The book has been modified.", extra_tags='alert')
+            return redirect('book')
+        return render(request, "adminstrator/new_book.html", {'form':form, 'book':book})
+    else:
+        raise PermissionError
 
 @login_required
-@admin_only
 def delete_book(request, id):
-    book = Books.objects.get(book_id=id)
+    if User.is_superuser:
+        book = Books.objects.get(book_id=id)
 
-    if request.method == 'POST':
-        book.delete()
-        return redirect('book')
+        if request.method == 'POST':
+            book.delete()
+            messages.error(request, "The book has been deleted.", extra_tags='alert')
+            return redirect('book')
 
-    return render(request, "adminstrator/confirmation.html", {'book': book})
+        return render(request, "adminstrator/confirmation.html", {'book': book})
+    else:
+        raise PermissionError
 
 @login_required
 @admin_only
@@ -68,38 +75,45 @@ def genres(request):
     return render(request, "adminstrator/genres.html", {'genre_list': genre_list})
 
 @login_required
-@admin_only
 def add_genre(request):
-    form = GenreForm(request.POST or None)
+    if User.is_superuser:
+        form = GenreForm(request.POST or None)
 
-    if form.is_valid():
-        form.save()
-        return redirect('genre')
+        if form.is_valid():
+            form.save()
+            return redirect('genre')
 
-    return render(request, "adminstrator/new_genre.html", {'form': form})
+        return render(request, "adminstrator/new_genre.html", {'form': form})
+    else:
+        raise PermissionError
 
 @login_required
-@admin_only
 def update_genre(request, id):
-    genre = Genres.objects.get(genre_id=id)
-    form = GenreForm(request.POST or None, instance=genre)
+    if User.is_superuser:
+        genre = Genres.objects.get(genre_id=id)
+        form = GenreForm(request.POST or None, instance=genre)
 
-    if form.is_valid():
-        form.save()
-        return redirect('genre')
+        if form.is_valid():
+            form.save()
+            return redirect('genre')
 
-    return render(request, "adminstrator/new_genre.html", {'form': form, 'genre': genre})
+        return render(request, "adminstrator/new_genre.html", {'form': form, 'genre': genre})
+    else:
+        raise PermissionError
 
 @login_required
-@admin_only
 def delete_genre(request, id):
-    genre = Genres.objects.get(genre_id=id)
+    if User.is_superuser:
 
-    if request.method == 'POST':
-        genre.delete()
-        return redirect('genre')
+        genre = Genres.objects.get(genre_id=id)
 
-    return render(request, "adminstrator/confirmation.html", {'genre': genre})
+        if request.method == 'POST':
+            genre.delete()
+            return redirect('genre')
+
+        return render(request, "adminstrator/confirmation.html", {'genre': genre})
+    else:
+        raise PermissionError
 
 @login_required
 @admin_only
@@ -124,27 +138,31 @@ def add_author(request):
     return render(request, "adminstrator/new_author.html", {'form':form})
 
 @login_required
-@admin_only
 def update_author(request, id):
-    author = Authors.objects.get(author_id=id)
-    form = AuthorForm(request.POST or None, instance=author)
+    if User.is_superuser:
+        author = Authors.objects.get(author_id=id)
+        form = AuthorForm(request.POST or None, instance=author)
 
-    if form.is_valid():
-        form.save()
-        return redirect('author')
+        if form.is_valid():
+            form.save()
+            return redirect('author')
 
-    return render(request,"adminstrator/new_author.html", {'form':form, 'author':author})
-
+        return render(request,"adminstrator/new_author.html", {'form':form, 'author':author})
+    else:
+        raise PermissionError
 @login_required
-@admin_only
 def delete_author(request, id):
-    authors = Authors.objects.get(author_id=id)
+    if User.is_superuser:
 
-    if request.method == 'POST':
-        authors.delete()
-        return redirect('author')
+        authors = Authors.objects.get(author_id=id)
 
-    return render(request, "adminstrator/confirmation.html", {'author': authors})
+        if request.method == 'POST':
+            authors.delete()
+            return redirect('author')
+
+        return render(request, "adminstrator/confirmation.html", {'author': authors})
+    else:
+        raise PermissionError
 
 @login_required
 @admin_only
@@ -165,26 +183,32 @@ def add_publisher(request):
     return render(request, "adminstrator/new_publisher.html", {'form':form})
 
 @login_required
-@admin_only
 def update_publisher(request, id):
-    publisher = Publishers.objects.get(publish_id=id)
-    form = PublisherForm(request.POST or None, instance=publisher)
+    if User.is_superuser:
+        publisher = Publishers.objects.get(publish_id=id)
+        form = PublisherForm(request.POST or None, instance=publisher)
 
-    if form.is_valid():
-        form.save()
-        return redirect('publisher')
+        if form.is_valid():
+            form.save()
+            return redirect('publisher')
 
-    return render(request, "adminstrator/new_publisher.html", {'form':form, 'publishers':publisher})
+        return render(request, "adminstrator/new_publisher.html", {'form':form, 'publishers':publisher})
+    else:
+        raise PermissionError
 
 @login_required
-@admin_only
 def delete_publisher(request, id):
-    publisher = Publishers.objects.get(publish_id = id)
-    if request.method == "POST":
-        publisher.delete()
-        return redirect('publisher')
+    if User.is_superuser:
 
-    return render(request, "adminstrator/confirmation.html", {'publisher':publisher})
+        publisher = Publishers.objects.get(publish_id = id)
+        if request.method == "POST":
+            publisher.delete()
+            return redirect('publisher')
+
+        return render(request, "adminstrator/confirmation.html", {'publisher':publisher})
+    else:
+        raise PermissionError
+
 
 @login_required
 @admin_only
@@ -205,28 +229,33 @@ def add_faculty(request):
     return render(request, "adminstrator/new_faculty.html", {'form': form})
 
 @login_required
-@admin_only
 def update_faculty(request, id):
-    faculty = Faculty.objects.get(f_id=id)
+    if User.is_superuser:
 
-    form = FacultyForm(request.POST or None, instance=faculty)
+        faculty = Faculty.objects.get(f_id=id)
 
-    if form.is_valid():
-        form.save()
-        return redirect('faculty')
+        form = FacultyForm(request.POST or None, instance=faculty)
 
-    return render(request, "adminstrator/new_faculty.html", {'form': form, 'faculties': faculty})
+        if form.is_valid():
+            form.save()
+            return redirect('faculty')
+
+        return render(request, "adminstrator/new_faculty.html", {'form': form, 'faculties': faculty})
+    else:
+        raise PermissionError
 
 @login_required
-@admin_only
 def delete_faculty(request,id):
-    faculty = Faculty.objects.get(f_id=id)
+    if User.is_superuser:
+        faculty = Faculty.objects.get(f_id=id)
 
-    if request.method == "POST":
-        faculty.delete()
-        return redirect('faculty')
+        if request.method == "POST":
+            faculty.delete()
+            return redirect('faculty')
 
-    return render(request, "adminstrator/confirmation.html", {'faculties': faculty})
+        return render(request, "adminstrator/confirmation.html", {'faculties': faculty})
+    else:
+        raise PermissionError
 
 @login_required
 @admin_only
@@ -247,30 +276,33 @@ def add_student(request):
     return render(request, "adminstrator/new_student.html", {'form': form})
 
 @login_required
-@admin_only
 def update_student(request, id):
-    student = Students.objects.get(s_id=id)
-    form = StudentForm(request.POST or None, instance=student)
+    if User.is_superuser:
+        student = Students.objects.get(s_id=id)
+        form = StudentForm(request.POST or None, instance=student)
 
-    if form.is_valid():
-        form.save()
-        return redirect('student')
+        if form.is_valid():
+            form.save()
+            return redirect('student')
 
-    return render(request, "adminstrator/new_student.html", {'form':form,'students': student})
+        return render(request, "adminstrator/new_student.html", {'form':form,'students': student})
+    else:
+        raise PermissionError
 
 @login_required
-@admin_only
 def delete_student(request, id):
-    student = Students.objects.get(s_id=id)
+    if User.is_superuser:
+        student = Students.objects.get(s_id=id)
 
-    if request.method == 'POST':
-        student.delete()
-        return redirect('student')
+        if request.method == 'POST':
+            student.delete()
+            return redirect('student')
 
-    return render(request, "adminstrator/confirmation.html", {'student':student})
+        return render(request, "adminstrator/confirmation.html", {'student':student})
+    else:
+        raise PermissionError
 
 @login_required
-@admin_only
 def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(data=request.POST, user=request.user)
@@ -306,22 +338,14 @@ def login_view(request):
                 login(request,user)
                 return redirect('library')
             else:
-                messages.error(request, "Invalid username or password.")
+                pass
     form = AuthenticationForm()
     return render(request,'adminstrator/login.html',{'form':form})
 
 
 def library_home(request):
-    if request.method == 'POST':
-        form = IssueForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('library')
-        else:
-            return redirect('librarian/404.html')
-    else:
-        form = IssueForm()
-    return render(request, 'librarian/homepage.html', {'form':form})
+    book_list = Books.objects.all()
+    return render(request, "librarian/homepage.html", {'book_list': book_list})
 
 def register_view(request):
     if request.method == 'POST':
@@ -399,10 +423,12 @@ def return_book(request):
     if request.method=='POST':
         form = ReturnForm(request.POST)
         obj = Transactions.objects.filter(b_id=request.POST.get('book_id')).filter(return_status=0)
+        book = Book_Number.objects.filter(b_id=request.POST.get('book_id'))
         if form.is_valid() and obj.count()==1:
             objs = obj[0]
             objs.return_date = datetime.now()
             objs.return_status = 1
+            book.status = 'Available'
             objs.save()
             return redirect('library')
         else:

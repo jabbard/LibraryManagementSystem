@@ -63,10 +63,7 @@ class Book_Number(models.Model):
     status = models.CharField(choices=status_choices, default="", max_length=20)
 
     def __str__(self):
-        return "%s (%s)" % (
-            self.b_id,
-            ", ".join(Books.book_name for book_id in Book_Number.objects.all())
-        )
+        return self.b_id
 
 class Faculty(models.Model):
     f_id = models.CharField(primary_key=True, max_length=10)
