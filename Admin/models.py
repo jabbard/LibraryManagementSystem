@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import User
 
@@ -89,7 +89,7 @@ class Transactions(models.Model):
     student_id = models.ForeignKey(Students, on_delete=models.CASCADE)
     b_id = models.ForeignKey(Book_Number, on_delete=models.CASCADE)
     issued_date = models.DateTimeField(default=datetime.now)
-    return_date = models.DateTimeField(default=datetime.now())
+    return_date = models.DateTimeField(default=datetime.now()+timedelta(days=10))
     return_status = models.IntegerField(default=0)
 
     def __str__(self):
@@ -98,6 +98,7 @@ class Transactions(models.Model):
 class Structures(models.Model):
     days = models.IntegerField(default=10, max_length=2)
     fine = models.IntegerField(default=5, max_length=2)
+    date = models.DateTimeField(default=datetime.now)
 
     def __str__(self):
         return str(self.days)+" "+str(self.fine)

@@ -74,3 +74,9 @@ class IssueForm(forms.ModelForm):
 
 class ReturnForm(forms.Form):
     book_id = forms.CharField(label="Book ID")
+
+
+class StructuresForm(forms.ModelForm):
+    class Meta:
+        model = Structures
+        fields = ['fine', 'days']

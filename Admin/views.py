@@ -1,7 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
-from .forms import BookForm, GenreForm, AuthorForm, PublisherForm, FacultyForm, StudentForm, SignupForm, IssueForm, ReturnForm
+from .forms import BookForm, GenreForm, AuthorForm, PublisherForm, FacultyForm, StudentForm, SignupForm, IssueForm, \
+    ReturnForm, StructuresForm
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.sites.shortcuts import get_current_site
@@ -344,8 +345,9 @@ def login_view(request):
 
 
 def library_home(request):
-    book_list = Books.objects.all()
-    return render(request, "librarian/homepage.html", {'book_list': book_list})
+    transaction = Transactions.objects.filter(return_status=0).prefetch_related('student_id').prefetch_related('b_id')
+    return render(request, "librarian/homepage.html", {'transaction': transaction})
+
 
 def register_view(request):
     if request.method == 'POST':
@@ -392,7 +394,7 @@ def activate(request, uidb64, token):
     else:
         return HttpResponse('Activation link is invalid!')
 
-
+@login_required
 def issue_book(request):
     if request.method == 'POST':
         st = request.POST.get('student_id')
@@ -422,13 +424,15 @@ def issue_book(request):
 def return_book(request):
     if request.method=='POST':
         form = ReturnForm(request.POST)
-        obj = Transactions.objects.filter(b_id=request.POST.get('book_id')).filter(return_status=0)
-        book = Book_Number.objects.filter(b_id=request.POST.get('book_id'))
-        if form.is_valid() and obj.count()==1:
+        book_id = request.POST.get('book_id')
+        obj = Transactions.objects.filter(return_status=0)
+        book = Book_Number.objects.get(b_id=book_id)
+        if form.is_valid() and obj.filter(b_id=book_id).count()==1:
             objs = obj[0]
             objs.return_date = datetime.now()
             objs.return_status = 1
             book.status = 'Available'
+            book.save()
             objs.save()
             return redirect('library')
         else:
@@ -437,7 +441,35 @@ def return_book(request):
         form = ReturnForm()
     return render(request, 'librarian/return_book.html', {'form': form})
 
+@admin_only
 @login_required
 def barcodes(request):
     num = Book_Number.objects.all().prefetch_related('book_id')
     return render(request, "adminstrator/barcode_book.html", {'num':num})
+
+@admin_only
+@login_required
+def transactions(request):
+    transaction = Transactions.objects.filter(return_status=0).prefetch_related('student_id').prefetch_related('b_id')
+
+    return render(request, "adminstrator/transaction.html", {'transaction':transaction})
+
+@admin_only
+@login_required
+def structure(request):
+    structure = Structures.objects.all()
+    this_structure = structure.latest('date')
+
+    return render(request, "adminstrator/structures.html", {'structure':this_structure})
+
+@admin_only
+@login_required
+def update_structures(request):
+    if request.method == 'POST':
+        form = StructuresForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('structure')
+    else:
+        form = StructuresForm()
+    return render(request, "adminstrator/update_structures.html", {'form':form})

@@ -35,5 +35,8 @@ urlpatterns = [
     path('issue_book/', user_views.issue_book, name="issue"),
     path('return_book/', user_views.return_book, name="return"),
     path('barcode_num/', user_views.barcodes, name="barcode"),
+    path('transactions/', user_views.transactions, name="transaction"),
+    path('structures/', user_views.structure, name="structure"),
+    path('update_structures/', user_views.update_structures, name="update_structure"),
     path(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', user_views.activate, name="activate"),
 ]
