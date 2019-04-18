@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'Admin',
     'crispy_forms',
     'django.contrib.admin',
+    'searchableselect',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

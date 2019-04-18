@@ -11,16 +11,26 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from .tokens import account_activation_token
 from django.contrib.auth.models import User
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, send_mail
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .decorators import admin_only, staff_only
-
+from django.conf import settings
+import datetime
 
 @login_required
 @admin_only
 def index(request):
-    return render(request, "adminstrator/index.html")
+    no = Book_Number.objects.all().count()
+    taken = Book_Number.objects.filter(status='Taken').count()
+    inside = no - taken
+    transaction = Transactions.objects.filter(return_status=0).prefetch_related('student_id').prefetch_related('b_id')
+    return render(request, "adminstrator/index.html",{
+        'no':no,
+        'taken':taken,
+        'inside':inside,
+        'transaction':transaction,
+    })
 
 @login_required
 @admin_only
@@ -134,7 +144,6 @@ def add_author(request):
         return redirect('author')
     else:
         form = AuthorForm()
-        messages.error(request,"The author with similar id or name already exists!")
 
     return render(request, "adminstrator/new_author.html", {'form':form})
 
@@ -337,17 +346,30 @@ def login_view(request):
                 return redirect('index')
             elif user.is_staff:
                 login(request,user)
+                deadline_tomorrow = Transactions.objects.filter(return_date = datetime.date.today()+datetime.timedelta(days=1))
+                email = [tom.student_id.email for tom in deadline_tomorrow]
+                book = [tom.b_id.book_id.book_name for tom in deadline_tomorrow]
+
+                if len(email)>0:
+                    for e in email:
+                        subject = 'Reminder!'
+                        book_name = book[email.index(e)]
+                        email_from = settings.EMAIL_HOST_USER
+                        to = [e,]
+                        message = 'Dear {},\nPlease return {} book tomorrow or the next working day.'.format(e,book_name)
+                        send_mail(subject, message, email_from, to)
+
                 return redirect('library')
             else:
                 pass
     form = AuthenticationForm()
     return render(request,'adminstrator/login.html',{'form':form})
 
-
+@login_required
 def library_home(request):
     transaction = Transactions.objects.filter(return_status=0).prefetch_related('student_id').prefetch_related('b_id')
-    return render(request, "librarian/homepage.html", {'transaction': transaction})
-
+    storage = messages.get_messages(request)
+    return render(request, "librarian/homepage.html", {'transaction': transaction, 'storage':storage})
 
 def register_view(request):
     if request.method == 'POST':
@@ -421,15 +443,24 @@ def issue_book(request):
         form = IssueForm()
     return render(request, 'librarian/issue_book.html', {'form':form})
 
+@login_required
 def return_book(request):
     if request.method=='POST':
         form = ReturnForm(request.POST)
         book_id = request.POST.get('book_id')
         obj = Transactions.objects.filter(return_status=0)
         book = Book_Number.objects.get(b_id=book_id)
-        if form.is_valid() and obj.filter(b_id=book_id).count()==1:
+
+        if form.is_valid() and obj.filter(b_id=book_id).count() == 1:
             objs = obj[0]
-            objs.return_date = datetime.now()
+            days = datetime.date.today()-objs.return_date
+            if days > 0:
+                fine = Structures.objects.all()
+                messages.warning(request,"The book submitted is "+days+"late and the student has to pay"+(fine[len(fine)-1]*days), extra_tags='alert')
+            else:
+                messages.success(request,"The book has been returned.", extra_tags='alert')
+
+            objs.return_date = datetime.date.today()
             objs.return_status = 1
             book.status = 'Available'
             book.save()
@@ -473,3 +504,6 @@ def update_structures(request):
     else:
         form = StructuresForm()
     return render(request, "adminstrator/update_structures.html", {'form':form})
+
+def student(request):
+    return render(request, "student/home.html")

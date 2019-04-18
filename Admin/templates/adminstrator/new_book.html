@@ -10,6 +10,15 @@
         width: 130px;
     }
 
+    #div_id_author{
+        height: 100px;
+        overflow: auto;
+    }
+
+    #div_id_author > label{
+        display: none;
+    }
+
 </style>
 
 {% endblock %}
@@ -55,7 +64,10 @@
                         {{ form.description|as_crispy_field }}
                     </div>
                     <div class="col-6">
-                        {{ form.author|as_crispy_field }}
+                        Author*
+                        <div class="hi">
+                            {{ form.author|as_crispy_field }}
+                        </div>
                     </div>
                 </div>
                 <br/>

@@ -1,16 +1,24 @@
 from django import forms
 from .models import *
 from django.contrib.auth.forms import UserCreationForm
+from searchableselect.widgets import SearchableSelect
 
 class BookForm(forms.ModelForm):
     book_id = forms.CharField(label='Book ID')
     book_name = forms.CharField(label='Book Name')
     ISBN = forms.CharField(label='ISBN')
-    author = forms.ModelMultipleChoiceField(queryset=Authors.objects.all())
+
+    def __init__(self, *args, **kwargs):
+        super(BookForm, self).__init__(*args, **kwargs)
+        self.fields['author'].queryset = self.fields['author'].queryset.order_by('author_name')
 
     class Meta:
         model = Books
-        fields = ['book_id', 'book_name', 'ISBN', 'description', 'author', 'publisher', 'edition', 'type', 'genre']
+        #fields = ['book_id', 'book_name', 'ISBN', 'description', 'author', 'publisher', 'edition', 'type', 'genre']
+        exclude = ()
+        widgets = {
+            'author':SearchableSelect(model='Authors', search_field='author_name', many=True)
+        }
 
 
 
