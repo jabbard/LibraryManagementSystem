@@ -1,5 +1,6 @@
 {% extends 'student/base.html' %}
 {% load static %}
+{% static "Admin/static/" as baseUrl %}
 {% block body %}
 <section id="mu-slider" class="slick-initialized slick-slider">
     <!-- Start single slider item -->
@@ -34,26 +35,27 @@
                     </figure>
                 </div>
                 <div class="mu-slider-content">
-                    <h2>Welcome to Islington College Library</h2>
+                    <h2 style="rgba(62, 64, 149, 0.8)">Welcome to Islington College Library</h2>
                     <a href="#" class="mu-read-more-btn" tabindex="-1">Read More</a>
                 </div>
             </div>
             <div class="mu-slider-single slick-slide slick-current slick-active" data-slick-index="2" aria-hidden="false" tabindex="-1" role="option" aria-describedby="slick-slide02" style="width: 1519px;">
                 <div class="mu-slider-img">
                     <figure>
-                        <img src="{% static 'assets/img/img.jpg' %}" alt="img">
+                        <img src="{% static 'assets/img/image.jpg' %}" alt="img">
                     </figure>
                 </div>
-                <div class="mu-slider-content">
-                    <h2>Welcome to</h2>
+                <div class="mu-slider-content" style="background-color: rgba(73, 75, 159, 0.4); margin-right: 130px;">
+                    <div>
+                        <h2>Welcome to</h2>
                         <h2>Islington
-                        College Library</h2>
-
+                            College Library</h2>
+                    </div>
 
                 </div>
             </div>
             <div class="mu-slider-single slick-slide slick-cloned" data-slick-index="3" aria-hidden="true" tabindex="-1" style="width: 1519px;">
-            <div class="mu-slider-img">
+                <div class="mu-slider-img">
                     <figure>
                         <img src="{% static 'assets/img/img.jpg' %}" alt="img">
                     </figure>
@@ -62,7 +64,7 @@
                     <h2>Welcome to Islington College Library</h2>
                     <a href="#" class="mu-read-more-btn" tabindex="-1">Read More</a>
                 </div>
-        </div>
+            </div>
         </div>
     </div>
     <!-- Start single slider item -->
@@ -73,5 +75,34 @@
 
     <!-- Start single slider item -->
 </section>
-
+<section id="mu-service">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="mu-service-area">
+                    {% for book in books %}
+                    <div class="mu-service-single" style="background-color: transparent !important;">
+                        <div class="card" style="position: relative; overflow: hidden; border-radius: 10px; transition: 0.5s;">
+                            <div class="img-thumbnail">
+                                <img src="{{ baseUrl }}/static/assets/img/books/{{book.book_name}}.jpg" alt="{{book.book_name}}" style="height: 400px;">
+                            </div>
+                            <div class="content">
+                                <h4>{{book.book_name}}</h4>
+                                <h4>{% for i in book.author.all %}{{ i.author_name }} <br/> {% endfor %}</h4>
+                            </div>
+                        </div>
+                        <!--<figure>
+                            <img class="img-rounded img-thumbnail"src="{{ baseUrl }}/static/assets/img/books/{{book.book_name}}.jpg" alt="{{book.book_name}}" style="height: 350px;">
+                            <figcaption style="color: black">
+                                <h4>{{book.book_name}}</h4>
+                                <h4>{% for i in book.author.all %}{{ i.author_name }} <br/> {% endfor %}</h4>
+                            </figcaption>
+                        </figure>-->
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

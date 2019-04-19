@@ -506,4 +506,5 @@ def update_structures(request):
     return render(request, "adminstrator/update_structures.html", {'form':form})
 
 def student(request):
-    return render(request, "student/home.html")
+    books = Books.objects.all()[:3]
+    return render(request, "student/home.html", {'books':books})
