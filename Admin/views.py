@@ -344,7 +344,7 @@ def login_view(request):
             if user.is_superuser:
                 login(request, user)
                 return redirect('index')
-            elif user.is_staff:
+            elif user.is_staff and not user.is_superuser:
                 login(request,user)
                 deadline_tomorrow = Transactions.objects.filter(return_date = datetime.date.today()+datetime.timedelta(days=1))
                 email = [tom.student_id.email for tom in deadline_tomorrow]
@@ -360,10 +360,12 @@ def login_view(request):
                         send_mail(subject, message, email_from, to)
 
                 return redirect('library')
-            else:
-                pass
-    form = AuthenticationForm()
-    return render(request,'adminstrator/login.html',{'form':form})
+            elif not user.is_staff and not user.is_superuser:
+                login(request, user)
+                return redirect('student')
+    else:
+        form = AuthenticationForm()
+        return render(request,'adminstrator/login.html',{'form':form})
 
 @login_required
 def library_home(request):
@@ -412,7 +414,7 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
         login(request, user)
-        return redirect('library')
+        return redirect('student')
     else:
         return HttpResponse('Activation link is invalid!')
 
@@ -434,6 +436,9 @@ def issue_book(request):
         form = IssueForm(request.POST)
         if form.is_valid() and a<2 and book.type=='Borrowable' and book1.status=='Available':
             form.save()
+            a = book.count
+            book.count = a-1
+            book.save()
             book1.status='Taken'
             book1.save()
             return redirect('library')
@@ -449,8 +454,8 @@ def return_book(request):
         form = ReturnForm(request.POST)
         book_id = request.POST.get('book_id')
         obj = Transactions.objects.filter(return_status=0)
-        book = Book_Number.objects.get(b_id=book_id)
-
+        books = Book_Number.objects.get(b_id=book_id)
+        book = Books.objects.get(book_id=books.book_id)
         if form.is_valid() and obj.filter(b_id=book_id).count() == 1:
             objs = obj[0]
             days = datetime.date.today()-objs.return_date
@@ -459,11 +464,13 @@ def return_book(request):
                 messages.warning(request,"The book submitted is "+days+"late and the student has to pay"+(fine[len(fine)-1]*days), extra_tags='alert')
             else:
                 messages.success(request,"The book has been returned.", extra_tags='alert')
-
+            a = book.count
+            book.count = a+1
+            book.save()
             objs.return_date = datetime.date.today()
             objs.return_status = 1
-            book.status = 'Available'
-            book.save()
+            books.status = 'Available'
+            books.save()
             objs.save()
             return redirect('library')
         else:
@@ -507,4 +514,20 @@ def update_structures(request):
 
 def student(request):
     books = Books.objects.all()[:3]
-    return render(request, "student/home.html", {'books':books})
+    user_count = Transactions.objects.filter(student_id=request.user.username)
+    a = user_count.filter(return_status=0).count()
+    return render(request, "student/home.html", {'books':books, 'num': a})
+
+def student_login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            return redirect('student')
+    form = AuthenticationForm()
+    return render(request,"student/login.html", {'form':form})
+
+

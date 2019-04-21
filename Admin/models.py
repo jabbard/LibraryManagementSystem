@@ -43,6 +43,7 @@ class Books(models.Model):
     type_choices = (('Reference', 'Reference'),('Borrowable', 'Borrowable'))
     type = models.CharField(max_length=20, choices=type_choices, default="")
     genre = models.ForeignKey(Genres, on_delete=models.SET_NULL, null=True)
+    count = models.IntegerField(default=0)
 
     def __str__(self):
         return self.book_name
@@ -74,7 +75,8 @@ class Faculty(models.Model):
 
 class Students(models.Model):
     s_id = models.CharField(primary_key=True, max_length=10)
-    st_name = models.CharField(max_length=100, default="")
+    first_name = models.CharField(max_length=50, default="")
+    last_name = models.CharField(max_length=50, default="")
     ph_validator = RegexValidator(regex='^(98[0-9]{8}|97[0-9]{8})', message="Invalid Phone no.")
     ph_num = models.CharField(validators=[ph_validator],max_length=15, default="")
     email_validator = RegexValidator(regex='^([\w]*[\w\.]*(?!\.)@islingtoncollege.edu.np)', message="Invalid email address!")
@@ -82,7 +84,7 @@ class Students(models.Model):
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.st_name
+        return self.first_name+" "+self.last_name
 
 class Transactions(models.Model):
     sn = models.BigAutoField(primary_key=True)
@@ -102,4 +104,14 @@ class Structures(models.Model):
 
     def __str__(self):
         return str(self.days)+" "+str(self.fine)
+
+class Borrows(models.Model):
+    st_id = models.ForeignKey(Students, on_delete=models.CASCADE)
+    booked_on = models.DateTimeField(default=datetime.date.today())
+    valid_till = models.DateTimeField(default=datetime.date.today() + datetime.timedelta(days=1))
+    validation_status = models.IntegerField(max_length=1, default=0)
+    book_id = models.ForeignKey(Books, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.st_id+" "+self.book_id
 

@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views as user_views
+from django.contrib.auth.views import LoginView
 
 urlpatterns = [
     path('', user_views.index, name="index"),
@@ -39,5 +40,7 @@ urlpatterns = [
     path('structures/', user_views.structure, name="structure"),
     path('students/', user_views.student, name="student"),
     path('update_structures/', user_views.update_structures, name="update_structure"),
+    path('student_login/', user_views.student_login, name="student_login"),
+    #path('student_logout/', user_views.student_logout, name="student_logout"),
     path(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', user_views.activate, name="activate"),
 ]

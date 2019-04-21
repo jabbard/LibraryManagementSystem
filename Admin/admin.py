@@ -14,7 +14,7 @@ admin.site.register(Publishers)
 admin.site.register(Faculty)
 admin.site.register(Transactions)
 admin.site.register(Structures)
-
+admin.site.register(Borrows)
 
 
 admin.site.register(Books)

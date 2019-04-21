@@ -1,6 +1,30 @@
 {% extends 'student/base.html' %}
 {% load static %}
 {% static "Admin/static/" as baseUrl %}
+{% block scripts %}
+<!--<style>
+    figure{
+        position: relative;
+
+    }
+    .mu-service-single figure figcaption{
+        position: absolute;
+        display: none;
+        width: 100%;
+        height: 60%;
+        bottom: -100%;
+        padding: 20px;
+        box-sizing: border-box;
+        text-align: center;
+        background: linear-gradient(0deg, #000000, transparent);
+        transition: 0.5s;
+    }
+
+    mu-service-single figure:hover figcaption{
+        bottom: 0;
+    }-->
+<!--</style>-->
+{% endblock %}
 {% block body %}
 <section id="mu-slider" class="slick-initialized slick-slider">
     <!-- Start single slider item -->
@@ -78,26 +102,51 @@
 <section id="mu-service">
     <div class="container">
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-12 col-md-12">
                 <div class="mu-service-area">
                     {% for book in books %}
                     <div class="mu-service-single" style="background-color: transparent !important;">
-                        <div class="card" style="position: relative; overflow: hidden; border-radius: 10px; transition: 0.5s;">
-                            <div class="img-thumbnail">
-                                <img src="{{ baseUrl }}/static/assets/img/books/{{book.book_name}}.jpg" alt="{{book.book_name}}" style="height: 400px;">
-                            </div>
+                        <!--<div class="card" style="position: relative; overflow: hidden; border-radius: 10px; transition: 0.5s;">
+                            <img src="{{ baseUrl }}/static/assets/img/books/{{books.0.book_name}}.jpg" alt="{{books.0.book_name}}" style="height: 350px;">
                             <div class="content">
-                                <h4>{{book.book_name}}</h4>
-                                <h4>{% for i in book.author.all %}{{ i.author_name }} <br/> {% endfor %}</h4>
+                                <h4>{{books.0.book_name}}</h4>
+                                <h4>{% for i in books.author.all %}{{ i.author_name }} <br/> {% endfor %}</h4>
                             </div>
                         </div>
-                        <!--<figure>
+                        <div class="card" style="position: relative; overflow: hidden; border-radius: 10px; transition: 0.5s;">
+                            <div class="img-box" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: 0.5s;">
+                                <img src="{{ baseUrl }}/static/assets/img/books/{{books.1.book_name}}.jpg" alt="{{book.book_name}}" style="height: 350px;">
+                            </div>
+                            <div class="content">
+                                <h4>{{books.1.book_name}}</h4>
+                                <h4>{% for i in books.author.all %}{{ i.author_name }} <br/> {% endfor %}</h4>
+                            </div>
+                        </div>
+                        <div class="card" style="position: relative; overflow: hidden; border-radius: 10px; transition: 0.5s;">
+                                <img src="{{ baseUrl }}/static/assets/img/books/{{books.2.book_name}}.jpg" alt="{{book.book_name}}" style="height: 350px;">
+                            <div class="content">
+                                <h4>{{books.2.book_name}}</h4>
+                                <h4>{% for i in books.author.all %}{{ i.author_name }} <br/> {% endfor %}</h4>
+                            </div>
+                        </div>-->
+                        <figure>
                             <img class="img-rounded img-thumbnail"src="{{ baseUrl }}/static/assets/img/books/{{book.book_name}}.jpg" alt="{{book.book_name}}" style="height: 350px;">
-                            <figcaption style="color: black">
-                                <h4>{{book.book_name}}</h4>
-                                <h4>{% for i in book.author.all %}{{ i.author_name }} <br/> {% endfor %}</h4>
+                            <figcaption style="color: black; font-weight: bold">
+                                <h4> {{book.book_name}} </h4>
+                                <p> Author(s): {% for i in book.author.all %}{{ i.author_name }} <br/> {% endfor %}</p>
+                                <p>{% if book.count > 0 %}
+                                    In Stock
+                                    {% else %}
+                                    Out of stock
+                                    {%  endif %}
+                                </p>
                             </figcaption>
-                        </figure>-->
+                        </figure>
+                        {% if user.is_authenticated %}
+                            <a href="#">
+                            <button class="btn btn-primary">Borrow</button>
+                            </a>
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
@@ -105,4 +154,11 @@
         </div>
     </div>
 </section>
+<!--<div class="container" style="position: relative; width:1000px; margin: 150px auto 0; height: auto; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 440px; grid-gap: 40px;">
+    {% for book in books %}
+        <div class="card" style="position: relative; background:#000000; overflow: hidden; border-radius: 10px; transition: 0.5s;">
+
+        </div>
+    {% endfor %}
+</div>-->
 {% endblock %}
