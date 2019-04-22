@@ -100,6 +100,7 @@ class Transactions(models.Model):
 class Structures(models.Model):
     days = models.IntegerField(default=10, max_length=2)
     fine = models.IntegerField(default=5, max_length=2)
+    no_of_books = models.IntegerField(default=2, max_length=1)
     date = models.DateTimeField(default=datetime.date.today())
 
     def __str__(self):
@@ -111,7 +112,8 @@ class Borrows(models.Model):
     valid_till = models.DateTimeField(default=datetime.date.today() + datetime.timedelta(days=1))
     validation_status = models.IntegerField(max_length=1, default=0)
     book_id = models.ForeignKey(Books, on_delete=models.CASCADE)
+    seen_status = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.st_id+" "+self.book_id
+        return str(self.st_id)+" "+str(self.book_id)
 

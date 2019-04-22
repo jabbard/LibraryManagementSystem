@@ -371,7 +371,9 @@ def login_view(request):
 def library_home(request):
     transaction = Transactions.objects.filter(return_status=0).prefetch_related('student_id').prefetch_related('b_id')
     storage = messages.get_messages(request)
-    return render(request, "librarian/homepage.html", {'transaction': transaction, 'storage':storage})
+    counter = Borrows.objects.filter(validation_status=0)
+    count = counter.filter(seen_status=0).count
+    return render(request, "librarian/homepage.html", {'transaction': transaction, 'storage':storage, 'count':count,})
 
 def register_view(request):
     if request.method == 'POST':
@@ -514,9 +516,11 @@ def update_structures(request):
 
 def student(request):
     books = Books.objects.all()[:3]
-    user_count = Transactions.objects.filter(student_id=request.user.username)
-    a = user_count.filter(return_status=0).count()
-    return render(request, "student/home.html", {'books':books, 'num': a})
+    count = 0
+    if request.user.is_authenticated:
+        user_count = Transactions.objects.filter(student_id=request.user.username)
+        count = user_count.filter(return_status=0).count()
+    return render(request, "student/home.html", {'books':books, 'num': count})
 
 def student_login(request):
     if request.method == 'POST':
@@ -529,5 +533,23 @@ def student_login(request):
             return redirect('student')
     form = AuthenticationForm()
     return render(request,"student/login.html", {'form':form})
+
+@login_required(login_url='student_login')
+def borrow(request, id):
+    student_id = Students.objects.get(s_id=request.user.username)
+    book_id = Books.objects.get(book_id=id)
+    time = datetime.time.now()
+    if time.time() > datetime.time(17,0,0,0):
+        borrowed = Borrows.objects.create(st_id=student_id,book_id=book_id,valid_till=time.timedelta(days=2))
+    else:
+        borrowed = Borrows.objects.create(st_id = student_id, book_id=book_id)
+    borrowed.save()
+    return redirect('student')
+
+@login_required
+def borrowal_page(request):
+    list = Borrows.objects.filter(validation_status=0)
+    return render(request, "librarian/borrowal.html", {'list':list})
+
 
 

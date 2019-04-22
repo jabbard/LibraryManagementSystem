@@ -41,6 +41,8 @@ urlpatterns = [
     path('students/', user_views.student, name="student"),
     path('update_structures/', user_views.update_structures, name="update_structure"),
     path('student_login/', user_views.student_login, name="student_login"),
+    path('borrow/<slug:id>/', user_views.borrow, name="borrow"),
+    path('borrowals/', user_views.borrowal_page, name="borrowing"),
     #path('student_logout/', user_views.student_logout, name="student_logout"),
     path(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', user_views.activate, name="activate"),
 ]

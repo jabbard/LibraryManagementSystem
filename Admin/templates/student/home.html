@@ -142,8 +142,8 @@
                                 </p>
                             </figcaption>
                         </figure>
-                        {% if user.is_authenticated %}
-                            <a href="#">
+                        {% if user.is_authenticated and num >= 0 and num < 2 %}
+                            <a href="{%  url 'borrow' book.book_id %}">
                             <button class="btn btn-primary">Borrow</button>
                             </a>
                         {% endif %}
