@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block scripts %}
+<style>
+    textarea{
+        height: 106px !important;
+    }
+
+    button{
+        width: 130px;
+    }
+
+    #div_id_author{
+        height: 100px;
+        overflow: auto;
+    }
+
+    #div_id_author > label{
+        display: none;
+    }
+
+</style>
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container">
+      <div class="row justify-content-center">
+        <div class="col-11">
+          <h1 class="mt-2" style="text-align: center;">Enter Book Details</h1>
+          <hr class="mt-0 mb-4">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-6">
+                        {{ form.book_id|as_crispy_field }}
+                    </div>
+                    <div class="col-6">
+                        {{ form.book_name|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        {{ form.ISBN|as_crispy_field }}
+                    </div>
+                    <div class="col-6">
+                        {{ form.publisher|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        {{ form.edition|as_crispy_field }}
+                    </div>
+                    <div class="col-4">
+                        {{ form.type|as_crispy_field }}
+                    </div>
+                    <div class="col-4">
+                        {{ form.genre|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        {{ form.description|as_crispy_field }}
+                    </div>
+                    <div class="col-6">
+                        Author*
+                        <div class="hi">
+                            {{ form.author|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                <div class="form-group">
+                    <div class="col-md-6 offset-5">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-save"> Save</i>
+                    </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+      </div>
+
+<div class="row justify-content-center">
+
+
+
+                {% if book %}
+                    <a href="{% url 'delete_book' book.book_id %}">
+                        <button class="btn btn-outline-danger" style="margin-right: 5px;">
+                            <i class="fas fa-trash"> Delete</i>
+                        </button>
+                    </a>
+                {% endif %}
+
+
+
+    </div>
+</div>
+
+
+
+{% endblock %}

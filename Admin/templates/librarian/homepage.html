@@ -1,0 +1,82 @@
+{% extends 'librarian/index.html' %}
+{% block script %}
+    <meta http-equiv="refresh" content="30">
+{%  endblock %}
+{% block body %}
+
+
+<div class="container">
+  {% if messages %}
+  <br/>
+  <br/>
+  <div class="row">
+      {% for message in messages %}
+          <div class="{{ message.tags }} col-xl-12">
+            {{ message }}
+          </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <br/>
+  <br/>
+  <div class="card mb-3">
+    <div class="card-header">
+      <i class="fas fa-table"></i>
+      Transaction Table</div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+          <thead>
+          <tr>
+            <th>Student</th>
+            <th>Book ID</th>
+            <th>Book Name</th>
+            <th>Issued Date</th>
+            <th>Return Date</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          {% for transactions in transaction %}
+          <tr>
+            <td>{{ transactions.student_id }}</td>
+            <td>{{ transactions.b_id }}</td>
+            <td>{{ transactions.b_id.book_id }}</td>
+            <td>{{ transactions.issued_date|date:'Y-m-d' }}</td>
+            <td>{{ transactions.return_date|date:'Y-m-d' }}</td>
+
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!--<div class="row">
+      <table class="table">
+          <thead>
+            <tr>
+
+            </tr>
+          </thead>
+          <tbody>
+            {% for faculties in faculty %}
+            <tr>
+              <td>{{ faculties.f_id }}</td>
+              <td>{{ faculties.f_name }}</td>
+                <td>
+                <a href="{% url 'update_faculty' faculties.f_id %}">
+                  <button type="button" class="btn btn-outline-primary">Change</button>
+                </a>
+
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+  </div>-->
+</div>
+{% endblock %}

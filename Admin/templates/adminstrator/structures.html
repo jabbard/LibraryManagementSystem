@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row" style="padding-top: 20px; float: right; margin-right: 0px;">
+        <a href="{% url 'update_structure' %}"><button type="button" class="btn btn-outline-dark"><i class="fas fa-plus-circle"> Change structure</i></button></a>
+    </div>
+
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-feed"></i>
+            Current Structures</div>
+        <div class="card-body">
+            <h5>Total number of days a book can be kept: {{ structure.days }}</h5>
+            <hr>
+            <h5>Fine per day: {{ structure.fine }}</h5>
+
+        </div>
+        <div class="card-footer small text-muted">Updated yesterday at {{ structure.date }}</div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row" style="padding-top: 20px; float: right; margin-right: 0px; ">
+        <a href="{% url 'add_publisher' %}"><button type="button" class="btn btn-outline-dark" style="font-family: 'Century Gothic';"><i class="fas fa-plus-circle"> Add New Publisher</i></button></a>
+    </div>
+
+    <br/>
+    <br/>
+  <br/>
+  <br/>
+    <div class="card mb-3">
+      <div class="card-header">
+        <i class="fas fa-table"></i>
+        Publisher Table</div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead>
+              <tr>
+                <th>Publisher ID</th>
+                <th>Publisher Name</th>
+                <th>City</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for publisher in publishers %}
+              <tr>
+                <td>{{ publisher.publish_id }}</td>
+                <td>{{ publisher.publisher_name }}</td>
+                <td>{{ publisher.city }}</td>
+                  <td>
+                  <a href="{% url 'update_publisher' publisher.publish_id %}">
+                    <button type="button" class="btn btn-outline-primary">Change</button>
+                  </a>
+
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    <!--<div class="row">
+        <table class="table" >
+            <thead>
+              <tr>
+                <th>Publisher ID</th>
+                <th>Publisher Name</th>
+                <th>City</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for publisher in publishers %}
+              <tr>
+                <td>{{ publisher.publish_id }}</td>
+                <td>{{ publisher.publisher_name }}</td>
+                <td>{{ publisher.city }}</td>
+                  <td>
+                  <a href="{% url 'update_publisher' publisher.publish_id %}">
+                    <button type="button" class="btn btn-outline-primary">Change</button>
+                  </a>
+
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+    </div>-->
+</div>
+{% endblock %}
