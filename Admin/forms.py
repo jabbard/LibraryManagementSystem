@@ -72,16 +72,12 @@ class SignupForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2')
 
 
-class IssueForm(forms.ModelForm):
+class IssueForm(forms.Form):
     b_id = forms.ModelChoiceField(label="Barcode", queryset=Book_Number.objects.all())
-    student_id = forms.ModelChoiceField(label="Student ID", queryset=Students.objects.all())
-    class Meta:
-        model=Transactions
-        fields= ['b_id','student_id']
-
+    student_id = forms.CharField(label="Student ID")
 
 class ReturnForm(forms.Form):
-    book_id = forms.CharField(label="Book ID")
+    book_id = forms.ModelChoiceField(label="Book ID", queryset=Book_Number.objects.filter(status='Taken'))
 
 
 class StructuresForm(forms.ModelForm):

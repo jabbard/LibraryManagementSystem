@@ -17,6 +17,7 @@ from django.contrib import messages
 from .decorators import admin_only, staff_only
 from django.conf import settings
 import datetime
+from django.db.models import Q
 
 @login_required
 @admin_only
@@ -317,7 +318,7 @@ def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(data=request.POST, user=request.user)
         if form.is_valid():
-            messages.success(request, "Password Changed Successfully!")
+            messages.success(request, "Password Changed Successfully!", extra_tags='alert')
             form.save()
             #update_session_auth_hash(request, form.user)
             return redirect('index')
@@ -325,8 +326,28 @@ def change_password(request):
             messages.error(request, "Failure")
             return redirect('change_password')
     else:
+
         form = PasswordChangeForm(user=request.user)
-        return render(request, "adminstrator/change_password.html", {'form':form})
+        return render(request, "adminstrator/change_password.html", {'form':form})\
+
+@login_required
+def change_librarian_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(data=request.POST, user=request.user)
+        if form.is_valid():
+            messages.success(request, "Password Changed Successfully!", extra_tags='alert')
+            form.save()
+            #update_session_auth_hash(request, form.user)
+            return redirect('index')
+        else:
+            messages.error(request, "Failure")
+            return redirect('change_password')
+    else:
+
+        form = PasswordChangeForm(user=request.user)
+        return render(request, "librarian/change_password.html", {'form':form})
+
+
 
 @login_required
 def logout_view(request):
@@ -335,6 +356,7 @@ def logout_view(request):
     return redirect('login')
 
 def login_view(request):
+
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -360,9 +382,7 @@ def login_view(request):
                         send_mail(subject, message, email_from, to)
 
                 return redirect('library')
-            elif not user.is_staff and not user.is_superuser:
-                login(request, user)
-                return redirect('student')
+
     else:
         form = AuthenticationForm()
         return render(request,'adminstrator/login.html',{'form':form})
@@ -371,9 +391,9 @@ def login_view(request):
 def library_home(request):
     transaction = Transactions.objects.filter(return_status=0).prefetch_related('student_id').prefetch_related('b_id')
     storage = messages.get_messages(request)
-    counter = Borrows.objects.filter(validation_status=0)
+    counter = Borrows.objects.filter(Q(validation_status=0) | Q(validation_status=2))
     count = counter.filter(seen_status=0).count
-    return render(request, "librarian/homepage.html", {'transaction': transaction, 'storage':storage, 'count':count,})
+    return render(request, "librarian/homepage.html", {'transaction': transaction, 'messages':storage, 'count':count,})
 
 def register_view(request):
     if request.method == 'POST':
@@ -425,7 +445,7 @@ def issue_book(request):
     if request.method == 'POST':
         st = request.POST.get('student_id')
         trans = Transactions.objects.filter(student_id=st)
-        a=0
+        a = 0
         for val in trans:
             if val.return_status==0:
                 a=a+1
@@ -433,22 +453,49 @@ def issue_book(request):
         book1 = Book_Number.objects.get(b_id=book_id)
         book_num = book1.book_id
         book = Books.objects.get(book_id=book_num.book_id)
+        available = False
+        if (book1.status == 'Available'):
+            available = True
+        elif (book1.status == 'Borrowed'):
+            st_id = Borrows.objects.filter(st_id=st)
+            is_valid = st_id.filter(validation_status=1)
+            for valid in is_valid:
+                if(book1.book_id==valid.book_id):
+                    available=True
+            if not available:
+                messages.error(request, "This book is reserved.", extra_tags='alert')
+        is_student = Students.objects.get(s_id=st)
 
 
         form = IssueForm(request.POST)
-        if form.is_valid() and a<2 and book.type=='Borrowable' and book1.status=='Available':
-            form.save()
+        if form.is_valid() and a < (Structures.objects.latest('no_of_books').no_of_books) and book.type=='Borrowable' \
+            and available and is_student:
+            Transactions.objects.create(student_id=Students.objects.get(s_id=st), b_id=Book_Number.objects.get(b_id=book_id))
             a = book.count
             book.count = a-1
             book.save()
             book1.status='Taken'
             book1.save()
+            messages.success(request, "The books has been lended.", extra_tags='alert')
             return redirect('library')
         else:
+            if(a>=Structures.objects.latest('no_of_books').no_of_books):
+                messages.error(request,"The student has borrowed the maximum number of books.", extra_tags='alert')
+                return redirect('issue')
+            elif(book.type != 'Borrowable'):
+                messages.error(request, "The book is a reference book and thus it cant be borrowed.", extra_tags='alert')
+                return redirect('issue')
+            elif(book1.status == 'Taken'):
+                messages.error(request, "The book is not available or has not been returned in the system",
+                               extra_tags='alert')
+                return redirect('issue')
+            elif(available):
+                messages.error(request,"The Student ID does not belong to any student.", extra_tags='alert')
             return redirect('issue')
     else:
+        storage = messages.get_messages(request)
         form = IssueForm()
-    return render(request, 'librarian/issue_book.html', {'form':form})
+        return render(request, 'librarian/issue_book.html', {'form':form, 'storage':messages})
 
 @login_required
 def return_book(request):
@@ -457,11 +504,12 @@ def return_book(request):
         book_id = request.POST.get('book_id')
         obj = Transactions.objects.filter(return_status=0)
         books = Book_Number.objects.get(b_id=book_id)
-        book = Books.objects.get(book_id=books.book_id)
+        bookID = books.book_id
+        book = Books.objects.get(book_id=bookID.book_id)
         if form.is_valid() and obj.filter(b_id=book_id).count() == 1:
             objs = obj[0]
-            days = datetime.date.today()-objs.return_date
-            if days > 0:
+            days = datetime.datetime.today() - objs.return_date.replace(tzinfo=None)
+            if days.days > Structures.objects.latest('days').days:
                 fine = Structures.objects.all()
                 messages.warning(request,"The book submitted is "+days+"late and the student has to pay"+(fine[len(fine)-1]*days), extra_tags='alert')
             else:
@@ -536,20 +584,72 @@ def student_login(request):
 
 @login_required(login_url='student_login')
 def borrow(request, id):
+    #storage = messages.get_messages(request)
     student_id = Students.objects.get(s_id=request.user.username)
     book_id = Books.objects.get(book_id=id)
-    time = datetime.time.now()
-    if time.time() > datetime.time(17,0,0,0):
-        borrowed = Borrows.objects.create(st_id=student_id,book_id=book_id,valid_till=time.timedelta(days=2))
+    time = datetime.datetime.now()
+    if time.time() > datetime.time(17,0,0,0) or time.weekday() == 4:
+        Borrows.objects.create(st_id=student_id,book_id=book_id,valid_till=time.timedelta(days=2))
     else:
-        borrowed = Borrows.objects.create(st_id = student_id, book_id=book_id)
-    borrowed.save()
+        Borrows.objects.create(st_id = student_id, book_id=book_id)
     return redirect('student')
 
 @login_required
 def borrowal_page(request):
+    storage = messages.get_messages(request)
     list = Borrows.objects.filter(validation_status=0)
-    return render(request, "librarian/borrowal.html", {'list':list})
+    accepted_list = Borrows.objects.filter(validation_status=1)
+    expiry_list = accepted_list.filter(valid_till__lte=datetime.datetime.today())
+    for a in expiry_list:
+        a.book_id.count = a.book_id.count + 1
+        a.validation_status = 2
+        a.save()
+    for lists in list:
+        lists.seen_status=1
+        lists.save()
+    return render(request, "librarian/borrowal.html", {'list':list, 'messages':storage})
+
+@login_required
+def accept_borrowal(request, pk):
+    borrow = Borrows.objects.get(pk=pk)
+    book = borrow.book_id.book_id
+    count = Books.objects.get(book_id=book)
+    st_filter = Transactions.objects.filter(student_id=borrow.st_id.s_id)
+    st_count = st_filter.filter(return_status=0).count()
+    if(borrow.valid_till.replace(tzinfo=None) > datetime.datetime.today().replace(tzinfo=None) and count.count>0 and st_count < Structures.objects.latest('no_of_books').no_of_books):
+        borrow.validation_status = 1
+        borrow.valid_till = datetime.datetime.today()+datetime.timedelta(days=1)
+        borrow.save()
+        book = borrow.book_id.book_id
+        barcode = Book_Number.objects.filter(book_id=book)
+        available_book = barcode.filter(status='Available')
+        if(available_book):mdc
+            available_book.status = 'Borrowed'
+            available_book.save()
+        count = Books.objects.get(book_id=book)
+        count.count = count.count - 1
+        count.save()
+        messages.success(request, "Success", extra_tags='alert')
+        subject = 'Your borrow request has been accepted!'
+        book_name = borrow.book_id.book_name
+        email_from = settings.EMAIL_HOST_USER
+        to = [borrow.st_id.email, ]
+        message = 'Dear {},\nYour request to borrow {} book has been accepted.\nPlease visit the library to collect the aforementioned book.'.format(borrow.st_id.first_name, book_name)
+        send_mail(subject, message, email_from, to)
+
+        return redirect('borrowing')
+    else:
+        messages.error(request,"The borrow request has expired.",extra_tags='alert')
+
+@login_required
+def decline_borrowal(request, pk):
+    borrowal = Borrows.objects.get(pk=pk)
+    borrowal.validation_status = 2
+    borrowal.save()
+    messages.error(request, "The borrow request has been rejected.", extra_tags='alert')
+    return redirect('borrowing')
+
+
 
 
 

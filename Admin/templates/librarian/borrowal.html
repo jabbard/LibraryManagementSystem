@@ -10,6 +10,17 @@
     <br/>
     <br/>
     <div class="container">
+        {% if messages %}
+            <br/>
+            <br/>
+            <div class="row">
+                {% for message in messages %}
+                    <div class="{{ message.tags }} col-xl-12">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         <div class="row">
             <div class="col-xl-12">
                 <legend style="text-align: center">Borrow Requests</legend>
@@ -24,13 +35,22 @@
                     </div>
                     <div class="card-body">
                         <div class="card-subtitle">
-                            <small style="color: gray; text-align: right;">
+                            <small style="color: gray; text-align: right; font-style: italic">
                                 Requested on: {{ lists.booked_on|date:'Y-m-d' }}
                             </small>
                         </div>
                         <p class="card-text">
                             Booked by: {{ lists.st_id }}
                         </p>
+                        <a class="btn btn-success" style="color:white" href="{% url 'accept_borrow' lists.pk %}">
+                            Accept
+                        </a>
+                        <a class="btn btn-danger" style="margin-left: 10px; color:white" href="{% url 'decline_borrow' lists.pk %}">
+                            Decline
+                        </a>
+                    </div>
+                    <div class="card-footer">
+                        <small>In stock: {{ lists.book_id.count }}</small>
                     </div>
                 </div>
             </div>

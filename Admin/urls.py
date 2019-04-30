@@ -31,6 +31,7 @@ urlpatterns = [
     path('students/update_student/<slug:id>', user_views.update_student, name="update_student"),
     path('students/delete_student/<slug:id>', user_views.delete_student, name="delete_student"),
     path('change_password/', user_views.change_password, name="change_password"),
+    path('change_password_librarian/', user_views.change_librarian_password, name="change_librarian_password"),
     path('home/', user_views.library_home, name="library"),
     path('register/', user_views.register_view, name="register"),
     path('issue_book/', user_views.issue_book, name="issue"),
@@ -43,6 +44,8 @@ urlpatterns = [
     path('student_login/', user_views.student_login, name="student_login"),
     path('borrow/<slug:id>/', user_views.borrow, name="borrow"),
     path('borrowals/', user_views.borrowal_page, name="borrowing"),
-    #path('student_logout/', user_views.student_logout, name="student_logout"),
+    path('accept_borrowal/<slug:pk>', user_views.accept_borrowal, name="accept_borrow"),
+    path('decline_borrowal/<slug:pk>', user_views.decline_borrowal, name="decline_borrow"),
+    #path('accept_borrow/<slug:pk>', user_views.student_logout, name="student_logout"),
     path(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', user_views.activate, name="activate"),
 ]

@@ -129,19 +129,22 @@
                                 <h4>{% for i in books.author.all %}{{ i.author_name }} <br/> {% endfor %}</h4>
                             </div>
                         </div>-->
-                        <figure>
-                            <img class="img-rounded img-thumbnail"src="{{ baseUrl }}/static/assets/img/books/{{book.book_name}}.jpg" alt="{{book.book_name}}" style="height: 350px;">
-                            <figcaption style="color: black; font-weight: bold">
-                                <h4> {{book.book_name}} </h4>
-                                <p> Author(s): {% for i in book.author.all %}{{ i.author_name }} <br/> {% endfor %}</p>
-                                <p>{% if book.count > 0 %}
-                                    In Stock
-                                    {% else %}
-                                    Out of stock
-                                    {%  endif %}
-                                </p>
-                            </figcaption>
-                        </figure>
+                        <a href="#{% comment %}{% url 'book_details' book.pk %}{% endcomment %}">
+                            <figure>
+
+                                <img class="img-rounded img-thumbnail"src="{{ baseUrl }}/static/assets/img/books/{{book.book_name}}.jpg" alt="{{book.book_name}}" style="height: 350px;">
+                                <figcaption style="color: black; font-weight: bold">
+                                    <h4> {{book.book_name}} </h4>
+                                    <p> Author(s): {% for i in book.author.all %}{{ i.author_name }} <br/> {% endfor %}</p>
+                                    <p>{% if book.count > 0 %}
+                                        In Stock
+                                        {% else %}
+                                        Out of stock
+                                        {%  endif %}
+                                    </p>
+                                </figcaption>
+                            </figure>
+                        </a>
                         {% if user.is_authenticated and num >= 0 and num < 2 %}
                             <a href="{%  url 'borrow' book.book_id %}">
                             <button class="btn btn-primary">Borrow</button>

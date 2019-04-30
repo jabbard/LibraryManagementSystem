@@ -1,19 +1,21 @@
 {% extends 'librarian/index.html' %}
-
+{% block script %}
+    <meta http-equiv="refresh" content="30">
+{%  endblock %}
 {% block body %}
 
 
 <div class="container">
-  {% if message %}
+  {% if messages %}
   <br/>
   <br/>
   <div class="row">
-    {% for messages in message %}
-    <div class="{{ messages.tags }} col-xl-12">
-      {{ messages }}
+      {% for message in messages %}
+          <div class="{{ message.tags }} col-xl-12">
+            {{ message }}
+          </div>
+      {% endfor %}
     </div>
-    {% endfor %}
-  </div>
   {% endif %}
 
   <br/>

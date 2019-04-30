@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    {% block script %}
+    {%  endblock %}
 
     <title>Islington College Library</title>
     {% load static %}
@@ -53,9 +55,7 @@
                 <i class="fas fa-user-circle fa-fw"></i>
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Settings</a>
-                <a class="dropdown-item" href="{% url 'change_password' %}">Change Password</a>
+                <a class="dropdown-item" href="{% url 'change_librarian_password' %}">Change Password</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="{% url 'logout' %}" data-toggle="modal" data-target="#logoutModal">Logout</a>
             </div>
@@ -118,7 +118,7 @@
             <a class="nav-link" href="{% url 'borrowing' %}">
                 <i class="fas fa-fw fa-share-square"></i>
                 <span>Borrow Request</span>
-                <span class="badge badge-danger">{{ count }}</span>
+                {% if count > 0 %}<span class="badge badge-danger">{{ count }}</span>{%  endif %}
             </a>
         </li>
         <!--<li class="nav-item dropdown">
